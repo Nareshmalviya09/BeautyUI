@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSellerContext } from "../context/SellerContext";
 
 import CategoryStep from "./steps/CategoryStep";
 import BrandStep from "./steps/BrandStep";
@@ -24,34 +25,43 @@ const steps = [
 
 export default function ProductCreate() {
   const [activeStep, setActiveStep] = useState(0);
-  const [productId, setProductId] = useState(null);
+
+  // 🔥 GLOBAL SELLER STATE
+  const { productId } = useSellerContext();
 
   const renderStep = () => {
     switch (activeStep) {
       case 0:
         return <CategoryStep onNext={() => setActiveStep(1)} />;
+
       case 1:
         return <BrandStep onNext={() => setActiveStep(2)} />;
+
       case 2:
         return (
           <ProductInfoStep
-            productId={productId}
-            setProductId={setProductId}
             onNext={() => setActiveStep(3)}
           />
         );
+
       case 3:
-        return <AttributeStep productId={productId} onNext={() => setActiveStep(4)} />;
+        return <AttributeStep onNext={() => setActiveStep(4)} />;
+
       case 4:
-        return <FeatureStep productId={productId} onNext={() => setActiveStep(5)} />;
+        return <FeatureStep onNext={() => setActiveStep(5)} />;
+
       case 5:
-        return <SpecificationStep productId={productId} onNext={() => setActiveStep(6)} />;
+        return <SpecificationStep onNext={() => setActiveStep(6)} />;
+
       case 6:
-        return <VariantStep productId={productId} onNext={() => setActiveStep(7)} />;
+        return <VariantStep onNext={() => setActiveStep(7)} />;
+
       case 7:
-        return <VariantPricingStep productId={productId} onNext={() => setActiveStep(8)} />;
+        return <VariantPricingStep onNext={() => setActiveStep(8)} />;
+
       case 8:
-        return <ImageUploadStep productId={productId} />;
+        return <ImageUploadStep />;
+
       default:
         return null;
     }
@@ -62,19 +72,25 @@ export default function ProductCreate() {
       {/* LEFT MENU */}
       <div style={{ width: 260, borderRight: "1px solid #ddd" }}>
         <h3 style={{ padding: 16 }}>Create Product</h3>
-        {steps.map((s, i) => (
-          <div
-            key={s}
-            onClick={() => (i === 0 || productId) && setActiveStep(i)}
-            style={{
-              padding: 12,
-              cursor: i === 0 || productId ? "pointer" : "not-allowed",
-              background: activeStep === i ? "#eee" : ""
-            }}
-          >
-            {i + 1}. {s}
-          </div>
-        ))}
+
+        {steps.map((s, i) => {
+          const enabled = i === 0 || productId;
+
+          return (
+            <div
+              key={s}
+              onClick={() => enabled && setActiveStep(i)}
+              style={{
+                padding: 12,
+                cursor: enabled ? "pointer" : "not-allowed",
+                background: activeStep === i ? "#eee" : "",
+                opacity: enabled ? 1 : 0.5
+              }}
+            >
+              {i + 1}. {s}
+            </div>
+          );
+        })}
       </div>
 
       {/* CONTENT */}

@@ -1,25 +1,25 @@
-import axios from "axios";
+// import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:8080",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+// const api = axios.create({
+//   baseURL: "http://localhost:8080",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
 
-// JWT interceptor (as per your base code)
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// // JWT interceptor (as per your base code)
+// api.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem("token");
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
-export default api;
+// export default api;
 // INTERCEPTOR -- object  hai ye axios deta hai. ye use hota request ko catch kerne ke liye taki hum token attach ker sake. (thoda aur structure ke bare me padho) 
 // DIFF - HTTP VS HTTPS --> encrypted request jati hai https me aur text format me jata hai http me. 
 // a) conversion from http to https - defaut connfig change kerni hogi.
@@ -27,3 +27,32 @@ export default api;
 // ASYNC DEFER -- 
 // ASYNC AWAIT 
 // COMPONENT BASED STRUCTURE -- 
+
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:8080",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 10000, // 🔥 safety: request hang na ho
+});
+
+// ✅ REQUEST INTERCEPTOR (JWT attach)
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // 🔍 DEBUG (dev only – optional)
+    console.log("API REQUEST:", config.method?.toUpperCase(), config.url);
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+export default api;

@@ -1,29 +1,51 @@
 import { useState } from "react";
-// import { createProduct } from "../../../../services/productApi";
+import axios from "axios";
 
 export default function ProductInfoStep({ setProductId, onNext }) {
   const [name, setName] = useState("");
 
+  // ✅ Simple axios instance (NO TOKEN, NO INTERCEPTOR)
+  const api = axios.create({
+    baseURL: "http://localhost:8080",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    timeout: 10000,
+  });
+
   const saveProduct = async () => {
-    // const res = await createProduct({ name });
-    // setProductId(res.data.id);
+    if (!name.trim()) {
+      alert("Product name required");
+      return;
+    }
 
-    // MOCK ID (REMOVE AFTER API)
-    setProductId(101);
+    try {
+      // ✅ Correct backend endpoint
+      const res = await api.post("/api/products", { name });
 
-    alert("Product created");
-    onNext();
+      // ✅ Backend se aaya real productId
+      setProductId(res.data.id);
+
+      alert("Product created");
+      onNext();
+    } catch (err) {
+      console.error("CREATE PRODUCT ERROR:", err);
+      alert("Failed to create product");
+    }
   };
 
   return (
     <>
       <h3>Product Info</h3>
+
       <input
         placeholder="Product Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
+
       <br /><br />
+
       <button onClick={saveProduct}>Save & Continue</button>
     </>
   );

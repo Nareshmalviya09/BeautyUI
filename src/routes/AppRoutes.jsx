@@ -34,6 +34,16 @@ const AppRoutes = () => {
       <Route path="/test-categories" element={<CategoryStep />} />
       <Route path="/test-variant" element={<VariantStep />} /> */}
       <Route path="/test-product" element={<ProductCreate />} />
+
+      
+      {/* ================= SELLER ROUTES ================= */}
+      <Route path="/seller" element={<SellerLayout />}>
+        <Route path="product" element={<ProductCreate />} />
+        <Route path="category" element={<CategoryStep />} />
+        <Route path="brand" element={<BrandStep />} />
+        <Route path="attributes" element={<AttributeStep />} />
+        <Route path="variants" element={<VariantStep />} />
+      </Route>
     </Routes>
   );
 };

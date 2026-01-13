@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import api from "../../../../api/axiosInstance";
+import { useSellerContext } from "../../context/SellerContext";
 
 export default function BrandStep({ onNext }) {
+  const { setBrandId } = useSellerContext(); // 🔥 GLOBAL CONTEXT
 
   const [brands, setBrands] = useState([]);
   const [brandName, setBrandName] = useState("");
   const [selectedBrandId, setSelectedBrandId] = useState("");
 
-  // 🔹 Load all brands (GET /api/brands)
+  // 🔹 Load all brands
   useEffect(() => {
     loadBrands();
   }, []);
@@ -22,14 +24,13 @@ export default function BrandStep({ onNext }) {
     }
   };
 
-  // 🔹 Add new brand (POST /api/brands/bulk)
+  // 🔹 Add new brand
   const addBrand = async () => {
     if (!brandName.trim()) {
       alert("Brand name is required");
       return;
     }
 
-    // Prevent duplicate brand (frontend check)
     const exists = brands.some(
       (b) => b.name.toLowerCase() === brandName.toLowerCase()
     );
@@ -40,9 +41,7 @@ export default function BrandStep({ onNext }) {
     }
 
     try {
-      await api.post("/api/brands/bulk", [
-        { name: brandName }
-      ]);
+      await api.post("/api/brands/bulk", [{ name: brandName }]);
 
       setBrandName("");
       await loadBrands();
@@ -53,15 +52,19 @@ export default function BrandStep({ onNext }) {
     }
   };
 
+  // 🔥 When brand selected
+  const handleBrandSelect = (e) => {
+    const id = e.target.value;
+    setSelectedBrandId(id);
+    setBrandId(Number(id)); // 🔥 GLOBAL CONTEXT
+  };
+
   return (
     <>
-      <h3>Brand</h3>
+      <h3>2. Brand</h3>
 
       {/* SELECT BRAND */}
-      <select
-        value={selectedBrandId}
-        onChange={(e) => setSelectedBrandId(e.target.value)}
-      >
+      <select value={selectedBrandId} onChange={handleBrandSelect}>
         <option value="">Select Brand</option>
         {brands.map((brand) => (
           <option key={brand.id} value={brand.id}>
@@ -84,7 +87,12 @@ export default function BrandStep({ onNext }) {
       <br /><br />
 
       {/* CONTINUE */}
-      <button onClick={onNext}>Save & Continue</button>
+      <button
+        onClick={onNext}
+        disabled={!selectedBrandId}
+      >
+        Save & Continue
+      </button>
     </>
   );
 }
