@@ -1,10 +1,15 @@
 import { useState } from "react";
 import axios from "axios";
+import { useSellerContext } from "../../context/SellerContext";
 
-export default function ProductInfoStep({ setProductId, onNext }) {
+export default function ProductInfoStep({ onNext }) {
+  const { setProductId, categoryId, brandId } = useSellerContext(); // 🔥 GLOBAL
+
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
 
-  // ✅ Simple axios instance (NO TOKEN, NO INTERCEPTOR)
+  // ✅ Simple axios instance (NO TOKEN)
   const api = axios.create({
     baseURL: "http://localhost:8080",
     headers: {
@@ -19,11 +24,21 @@ export default function ProductInfoStep({ setProductId, onNext }) {
       return;
     }
 
-    try {
-      // ✅ Correct backend endpoint
-      const res = await api.post("/api/products", { name });
+    if (!categoryId || !brandId) {
+      alert("Category & Brand must be selected first");
+      return;
+    }
 
-      // ✅ Backend se aaya real productId
+    try {
+      const res = await api.post("/api/products", {
+        name,
+        slug,          // ✅ NEW
+        description,   // ✅ NEW
+        categoryId,
+        brandId,
+      });
+
+      // 🔥 GLOBAL productId
       setProductId(res.data.id);
 
       alert("Product created");
@@ -36,12 +51,33 @@ export default function ProductInfoStep({ setProductId, onNext }) {
 
   return (
     <>
-      <h3>Product Info</h3>
+      <h3>3. Product Info</h3>
 
+      {/* PRODUCT NAME */}
       <input
         placeholder="Product Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
+      />
+
+      <br /><br />
+
+      {/* SLUG */}
+      <input
+        placeholder="Slug (e.g. face-wash)"
+        value={slug}
+        onChange={(e) => setSlug(e.target.value)}
+      />
+
+      <br /><br />
+
+      {/* DESCRIPTION */}
+      <textarea
+        placeholder="Product Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        rows={4}
+        style={{ width: "100%" }}
       />
 
       <br /><br />

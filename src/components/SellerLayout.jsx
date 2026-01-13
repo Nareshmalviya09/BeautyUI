@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { SellerProvider } from "./context/SellerContext";
+import { SellerProvider } from "../pages/seller/context/SellerContext";
 
 const SellerLayout = () => {
   return (

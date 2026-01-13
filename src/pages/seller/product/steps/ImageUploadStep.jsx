@@ -1,21 +1,19 @@
 import { useState } from "react";
+import { useSellerContext } from "../../context/SellerContext";
 
-export default function ImageUploadStep({ productId }) {
+export default function ImageUploadStep() {
+  const { productId } = useSellerContext(); // 🔥 GLOBAL PRODUCT ID
+
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-
     if (selectedFiles.length === 0) return;
 
     setFiles(selectedFiles);
-
-    const previews = selectedFiles.map(file =>
-      URL.createObjectURL(file)
-    );
-    setPreview(previews);
+    setPreview(selectedFiles.map(file => URL.createObjectURL(file)));
   };
 
   const uploadImages = async () => {
@@ -31,7 +29,7 @@ export default function ImageUploadStep({ productId }) {
 
     const formData = new FormData();
     files.forEach(file => {
-      formData.append("files", file); // MUST MATCH BACKEND
+      formData.append("files", file); // backend key must match
     });
 
     setLoading(true);
@@ -42,7 +40,6 @@ export default function ImageUploadStep({ productId }) {
         {
           method: "POST",
           body: formData
-          // ❌ DO NOT set Content-Type manually
         }
       );
 
@@ -56,7 +53,6 @@ export default function ImageUploadStep({ productId }) {
       alert("Images uploaded successfully ✅");
       setFiles([]);
       setPreview([]);
-
     } catch (error) {
       console.error("Server error:", error);
       alert("Server error ❌");
@@ -67,7 +63,7 @@ export default function ImageUploadStep({ productId }) {
 
   return (
     <div>
-      <h3>Upload Product Images</h3>
+      <h3>9. Upload Product Images</h3>
 
       <input
         type="file"

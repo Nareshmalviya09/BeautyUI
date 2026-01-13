@@ -9,12 +9,15 @@ import ForgotPassword from "../pages/ForgotPassword";
 import Profile from "../pages/Profile";
 
 import AttributeStep from "../pages/seller/product/steps/AttributeStep";
-
-import "../App.css";
 import BrandStep from "../pages/seller/product/steps/BrandStep";
 import CategoryStep from "../pages/seller/product/steps/CategoryStep";
 import VariantStep from "../pages/seller/product/steps/VariantStep";
 import ProductCreate from "../pages/seller/product/ProductCreate";
+import SellerLayout from "../components/SellerLayout";
+
+// ✅ BUYER PAGES (TOP LEVEL)
+import ProductList from "../pages/seller/product/ProductList";
+import ProductPage from "../pages/seller/product/ProductPage";
 
 const AppRoutes = () => {
   return (
@@ -28,14 +31,10 @@ const AppRoutes = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/profile" element={<Profile />} />
 
-      {/* 🔧 TEMP TEST ROUTE (REMOVE LATER) */}
-      {/* <Route path="/test-attributes" element={<AttributeStep />} />
-      <Route path="/test-brands" element={<BrandStep />} />
-      <Route path="/test-categories" element={<CategoryStep />} />
-      <Route path="/test-variant" element={<VariantStep />} /> */}
-      <Route path="/test-product" element={<ProductCreate />} />
+      {/* ================= BUYER ROUTES ================= */}
+      <Route path="/products" element={<ProductList />} />
+      <Route path="/product/:productId" element={<ProductPage />} />
 
-      
       {/* ================= SELLER ROUTES ================= */}
       <Route path="/seller" element={<SellerLayout />}>
         <Route path="product" element={<ProductCreate />} />
@@ -44,6 +43,7 @@ const AppRoutes = () => {
         <Route path="attributes" element={<AttributeStep />} />
         <Route path="variants" element={<VariantStep />} />
       </Route>
+
     </Routes>
   );
 };
