@@ -5,90 +5,190 @@ import api from "../../../api/axiosInstance";
 const ProductPage = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   useEffect(() => {
     api
       .get(`/api/buyer/products/${productId}`)
-      .then((res) => setProduct(res.data))
+      .then((res) => {
+        setProduct(res.data);
+        setSelectedVariant(res.data.variants?.[0]);
+      })
       .catch((err) => console.error("API ERROR", err));
   }, [productId]);
 
   if (!product) return <h2>Loading...</h2>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ background: "#EAEDED", minHeight: "100vh", padding: "20px" }}>
 
-      {/* BREADCRUMB */}
-      <div style={{ marginBottom: "10px", color: "gray" }}>
-        {product.breadcrumb?.map((c, i) => (
-          <span key={i}>
-            {c.name} {i < product.breadcrumb.length - 1 && " > "}
-          </span>
-        ))}
-      </div>
+      {/* MAIN CARD */}
+      <div
+        style={{
+          background: "#fff",
+          padding: "20px",
+          borderRadius: "6px",
+          maxWidth: "1100px",
+          margin: "auto",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+        }}
+      >
 
-      {/* BASIC INFO */}
-      <h1>{product.name}</h1>
-      <p><b>Brand:</b> {product.brand}</p>
+        {/* TOP SECTION */}
+        <div style={{ display: "flex", gap: "40px" }}>
 
-      {/* IMAGE */}
-      <img
-        src={product.images?.[0]?.imageUrl}
-        alt={product.name}
-        width="300"
-      />
+          {/* IMAGE */}
+          <div>
+            <img
+              src={product.images?.[0]?.imageUrl}
+              alt={product.name}
+              style={{ width: "300px", objectFit: "contain" }}
+            />
+          </div>
 
-      {/* VARIANTS */}
-      <h3>Variants</h3>
-      {product.variants.map((v) => (
-        <button key={v.id} style={{ marginRight: "10px" }}>
-          {v.value} - ₹{v.price}
-        </button>
-      ))}
+          {/* INFO */}
+          <div style={{ flex: 1 }}>
+            <h2>{product.name}</h2>
+            <p style={{ color: "#565959" }}>Brand: {product.brand}</p>
 
-      {/* ATTRIBUTES */}
-      <h3>Attributes</h3>
-      {product.attributes.map((a) => (
-        <div key={a.attributeName}>
-          <b>{a.attributeName}:</b>{" "}
-          {a.values.map((v) => (
-            <span key={v} style={{ marginRight: "6px" }}>
-              {v}
-            </span>
-          ))}
+            {/* PRICE */}
+            <p style={{ fontSize: "24px", color: "#B12704" }}>
+              ₹{selectedVariant?.price}
+            </p>
+
+            {/* VARIANTS */}
+            <h4>Variants</h4>
+            {product.variants?.map((v) => (
+              <button
+                key={v.id}
+                onClick={() => setSelectedVariant(v)}
+                style={{
+                  marginRight: "10px",
+                  marginBottom: "10px",
+                  padding: "6px 12px",
+                  borderRadius: "20px",
+                  border:
+                    selectedVariant?.id === v.id
+                      ? "2px solid #F08804"
+                      : "1px solid #ccc",
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                {v.value}
+              </button>
+            ))}
+
+            {/* ADD TO CART */}
+            <div>
+              <button
+                style={{
+                  marginTop: "15px",
+                  background: "#FFD814",
+                  border: "1px solid #FCD200",
+                  borderRadius: "20px",
+                  padding: "10px 25px",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                }}
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
         </div>
+
+        {/* ATTRIBUTES */}
+      {/* ATTRIBUTES */}
+<h3>Attributes</h3>
+
+{product.attributes && product.attributes.length > 0 ? (
+  product.attributes.map((a) => (
+    <div key={a.id} style={{ marginBottom: "8px" }}>
+      <b>{a.name}:</b>{" "}
+      {a.values.map((v) => (
+        <span
+          key={v.id}
+          style={{
+            display: "inline-block",
+            marginRight: "6px",
+            padding: "4px 10px",
+            border: "1px solid #ccc",
+            borderRadius: "12px",
+            fontSize: "13px",
+          }}
+        >
+          {v.value}
+        </span>
       ))}
+    </div>
+  ))
+) : (
+  <p>No attributes available</p>
+)}
 
-      {/* DESCRIPTION */}
-      <h3>Description</h3>
-      <p>{product.description}</p>
 
-      {/* SPECIFICATIONS */}
-      <h3>Specifications</h3>
-      <table border="1" cellPadding="6">
-        <tbody>
-          {product.specifications.map((s) => (
-            <tr key={s.name}>
-              <td>{s.name}</td>
-              <td>{s.value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {/* DESCRIPTION */}
+        <h3>Description</h3>
+        <p>{product.description}</p>
+
+        {/* SPECIFICATIONS */}
+       {/* SPECIFICATIONS */}
+<h3>Specifications</h3>
+
+{product.specifications && product.specifications.length > 0 ? (
+  <table
+    width="100%"
+    cellPadding="8"
+    style={{ borderCollapse: "collapse" }}
+  >
+    <tbody>
+      {product.specifications.map((s) => (
+        <tr key={s.id}>
+          <td
+            style={{
+              fontWeight: "bold",
+              width: "40%",
+              borderBottom: "1px solid #eee",
+            }}
+          >
+            {s.name}
+          </td>
+          <td style={{ borderBottom: "1px solid #eee" }}>
+            {s.value}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+) : (
+  <p>No specifications available</p>
+)}
+
 
       {/* FEATURES */}
-      <h3>Features</h3>
-      <ul>
-        {product.features.map((f) => (
-          <li key={f.feature}>{f.feature}</li>
-        ))}
-      </ul>
+<h3>Features</h3>
 
-      {/* MANUFACTURER */}
-      <h3>Manufacturer Info</h3>
-      <p>{product.manufacturerInfo?.manufacturerName}</p>
-      <p>{product.manufacturerInfo?.address}</p>
+{product.features && product.features.length > 0 ? (
+  <ul style={{ paddingLeft: "18px" }}>
+    {product.features.map((f) => (
+      <li key={f.id} style={{ marginBottom: "6px" }}>
+        {f.feature}
+      </li>
+    ))}
+  </ul>
+) : (
+  <p>No features available</p>
+)}
 
+        
+
+        {/* MANUFACTURER */}
+        <h3>Manufacturer Info</h3>
+        <p><b>{product.manufacturerInfo?.manufacturerName}</b></p>
+        <p>{product.manufacturerInfo?.address}</p>
+
+      </div>
     </div>
   );
 };
