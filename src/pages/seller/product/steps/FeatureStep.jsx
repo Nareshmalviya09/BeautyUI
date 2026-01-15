@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import api from "../../api/api";
+import api from "../../../../api/axiosInstance";
+import { useSellerContext } from "../../context/SellerContext";
 
-export default function FeatureStep({ productId, onNext }) {
+export default function FeatureStep({ onNext }) {
+  const { productId } = useSellerContext(); // 🔥 GLOBAL PRODUCT ID
+
   const [features, setFeatures] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,6 +25,11 @@ export default function FeatureStep({ productId, onNext }) {
 
   // ✅ Save features
   const handleSave = async () => {
+    if (!productId) {
+      alert("Product not created yet ❌");
+      return;
+    }
+
     const featureList = features
       .split("\n")
       .map((f) => f.trim())
@@ -52,7 +60,7 @@ export default function FeatureStep({ productId, onNext }) {
 
   return (
     <>
-      <h3>Product Features</h3>
+      <h3>5. Product Features</h3>
 
       <textarea
         rows={8}
@@ -65,7 +73,7 @@ export default function FeatureStep({ productId, onNext }) {
       <br /><br />
 
       <button onClick={handleSave} disabled={loading}>
-        {loading ? "Saving..." : "Save & Continue"}
+        {loading ? "Saving..." : "Save & Continue →"}
       </button>
     </>
   );

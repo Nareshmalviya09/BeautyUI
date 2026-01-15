@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import api from "../../api/api";
+import api from "../../../../api/axiosInstance";
+import { useSellerContext } from "../../context/SellerContext";
 
-export default function SpecificationStep({ productId, onNext }) {
+export default function SpecificationStep({ onNext }) {
+   const { productId } = useSellerContext(); // 🔥 GLOBAL PRODUCT ID
   const [specs, setSpecs] = useState([
     { specKey: "", specValue: "" },
   ]);

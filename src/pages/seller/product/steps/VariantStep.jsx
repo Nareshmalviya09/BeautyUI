@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import api from "../../../../api/axiosInstance";
+import { useSellerContext } from "../../context/SellerContext";
 
-export default function VariantStep({ productId, onNext }) {
+export default function VariantStep({ onNext }) {
+  const { productId } = useSellerContext(); // ✅ GLOBAL PRODUCT ID
 
   const [variants, setVariants] = useState([]);
-  const [variantName, setVariantName] = useState("");
 
-  // 🔹 Load variants for this product
+  // form fields
+  const [sku, setSku] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+
+  // 🔹 Load variants
   useEffect(() => {
     if (productId) {
       loadVariants();
@@ -32,8 +38,8 @@ export default function VariantStep({ productId, onNext }) {
       return;
     }
 
-    if (!variantName.trim()) {
-      alert("Variant name is required");
+    if (!sku || !price || !stock) {
+      alert("SKU, Price, and Stock are required");
       return;
     }
 
@@ -41,11 +47,18 @@ export default function VariantStep({ productId, onNext }) {
       await api.post(
         `/api/products/${productId}/variants`,
         {
-          name: variantName
+          sku: sku,
+          price: Number(price),
+          stock: Number(stock),
+          attributes: {} // 🔥 keep empty for now
         }
       );
 
-      setVariantName("");
+      // reset form
+      setSku("");
+      setPrice("");
+      setStock("");
+
       await loadVariants();
       alert("Variant created");
     } catch (error) {
@@ -61,10 +74,25 @@ export default function VariantStep({ productId, onNext }) {
       {/* ADD VARIANT */}
       <input
         type="text"
-        placeholder="Variant name (e.g 100ml, Red)"
-        value={variantName}
-        onChange={(e) => setVariantName(e.target.value)}
+        placeholder="SKU (e.g FOUNDATION-BEIGE-30ML)"
+        value={sku}
+        onChange={(e) => setSku(e.target.value)}
       />
+
+      <input
+        type="number"
+        placeholder="Price"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+      />
+
+      <input
+        type="number"
+        placeholder="Stock"
+        value={stock}
+        onChange={(e) => setStock(e.target.value)}
+      />
+
       <button onClick={addVariant}>Add Variant</button>
 
       <hr />
@@ -73,7 +101,7 @@ export default function VariantStep({ productId, onNext }) {
       <ul>
         {variants.map((variant) => (
           <li key={variant.id}>
-            {variant.name}
+            <b>{variant.sku}</b> – ₹{variant.price} – Stock: {variant.stock}
           </li>
         ))}
       </ul>

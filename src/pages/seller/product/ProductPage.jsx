@@ -133,36 +133,18 @@ const ProductPage = () => {
         <p>{product.description}</p>
 
         {/* SPECIFICATIONS */}
-       {/* SPECIFICATIONS */}
-<h3>Specifications</h3>
-
-{product.specifications && product.specifications.length > 0 ? (
-  <table
-    width="100%"
-    cellPadding="8"
-    style={{ borderCollapse: "collapse" }}
-  >
-    <tbody>
-      {product.specifications.map((s) => (
-        <tr key={s.id}>
-          <td
-            style={{
-              fontWeight: "bold",
-              width: "40%",
-              borderBottom: "1px solid #eee",
-            }}
-          >
-            {s.name}
-          </td>
-          <td style={{ borderBottom: "1px solid #eee" }}>
-            {s.value}
-          </td>
-        </tr>
+   {/* SPECIFICATIONS */}
+{product.specifications && product.specifications.length > 0 && (
+  <>
+    <h4>Specifications</h4>
+    <ul>
+      {product.specifications.map((spec) => (
+        <li key={spec.id}>
+          <strong>{spec.specKey}</strong>: {spec.specValue}
+        </li>
       ))}
-    </tbody>
-  </table>
-) : (
-  <p>No specifications available</p>
+    </ul>
+  </>
 )}
 
 
